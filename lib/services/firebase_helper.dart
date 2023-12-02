@@ -34,8 +34,4 @@ class FirebaseHelper {
       return [];
     }
   }
-
-  // Future<bool> getAllDocumentsForACollection(String collectionName) async {
-
-  // }
 }
