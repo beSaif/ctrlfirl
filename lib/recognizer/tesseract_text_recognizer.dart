@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_tesseract_ocr/android_ios.dart';
 import 'interface/text_recognizer.dart';
 
@@ -8,8 +9,8 @@ class TesseractTextRecognizer extends ITextRecognizer {
       "psm": "4",
       "preserve_interword_spaces": "1",
     });
-    print("----- Res");
-    print(res);
+    debugPrint("----- Res");
+    debugPrint(res.toString());
     return res;
   }
 }

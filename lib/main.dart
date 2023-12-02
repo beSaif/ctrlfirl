@@ -1,7 +1,5 @@
 import 'package:ctrlfirl/models/recognition_response.dart';
-import 'package:ctrlfirl/models/test_model.dart';
 import 'package:ctrlfirl/recognizer/interface/text_recognizer.dart';
-import 'package:ctrlfirl/recognizer/mlkit_text_recognizer.dart';
 import 'package:ctrlfirl/recognizer/tesseract_text_recognizer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,6 +45,16 @@ class _MainAppState extends State<MainApp> {
         child: Scaffold(
           body: Column(
             children: [
+              if (_response != null)
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(_response!.recognizedText),
+                      ],
+                    ),
+                  ),
+                ),
               ElevatedButton(
                   onPressed: () async {
                     await pickImage();
@@ -62,9 +70,10 @@ class _MainAppState extends State<MainApp> {
 
   pickImage() async {
     // Pick an image.
-    final XFile? _image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? imageLocal =
+        await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
-      image = _image;
+      image = imageLocal;
     });
   }
 

@@ -24,9 +24,9 @@ class FirebaseHelper {
     try {
       List<TestModel> tests = [];
       await _testCollection.get().then((value) {
-        value.docs.forEach((element) {
+        for (var element in value.docs) {
           tests.add(TestModel.fromJson(element.data() as Map<String, dynamic>));
-        });
+        }
       });
       return tests;
     } catch (e) {
