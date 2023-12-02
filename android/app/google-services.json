@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "539471081307",
+    "project_id": "ctrlfirl-2023-24",
+    "storage_bucket": "ctrlfirl-2023-24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539471081307:android:021489ecb819440800747e",
+        "android_client_info": {
+          "package_name": "com.example.ctrlfirl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuIgaoo9qUnrSYeWSySPDp4603vxYT0S0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
