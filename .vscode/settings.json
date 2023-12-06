@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["interword", "tessdata"]
+  "cSpell.words": ["interword", "tessdata"],
+  "cmake.configureOnOpen": false
 }

@@ -1,4 +1,6 @@
+import 'package:ctrlfirl/chat_screen.dart';
 import 'package:ctrlfirl/models/recognition_response.dart';
+import 'package:ctrlfirl/ocr_screen.dart';
 import 'package:ctrlfirl/recognizer/interface/text_recognizer.dart';
 import 'package:ctrlfirl/recognizer/tesseract_text_recognizer.dart';
 import 'package:flutter/material.dart';
@@ -22,69 +24,15 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  late ImagePicker _picker;
-  RecognitionResponse? _response;
-  late ITextRecognizer _recognizer;
-
-  XFile? image;
-  @override
-  void initState() {
-    super.initState();
-    _picker = ImagePicker();
-
-    /// Can be [MLKitTextRecognizer] or [TesseractTextRecognizer]
-    // _recognizer = MLKitTextRecognizer();
-    _recognizer = TesseractTextRecognizer();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SafeArea(
-        child: Scaffold(
-          body: Column(
-            children: [
-              if (_response != null)
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(_response!.recognizedText),
-                      ],
-                    ),
-                  ),
-                ),
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickImage();
-                    processImage(image!.path);
-                  },
-                  child: const Text('Hello World!')),
-            ],
-          ),
-        ),
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        useMaterial3: true,
       ),
+      home: const OCRScreen(),
     );
-  }
-
-  pickImage() async {
-    // Pick an image.
-    final XFile? imageLocal =
-        await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      image = imageLocal;
-    });
-  }
-
-  void processImage(String imgPath) async {
-    final recognizedText = await _recognizer.processImage(imgPath);
-    setState(() {
-      _response = RecognitionResponse(
-        imgPath: imgPath,
-        recognizedText: recognizedText,
-      );
-    });
-    debugPrint(recognizedText);
   }
 }
