@@ -18,7 +18,7 @@ class _ChatScreenState extends State<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ChatController chatController =
           Provider.of<ChatController>(context, listen: false);
-      chatController.startStream();
+      // chatController.startStream();
     });
     super.initState();
   }
@@ -48,7 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 // primaryColor: Colors.blue,
                 backgroundColor: Colors.black26,
               ),
-              messages: chatController.userMessages,
+              messages: chatController.chatMessages,
               onSendPressed: chatController.handleOnPressed,
               user: chatController.user,
             ),

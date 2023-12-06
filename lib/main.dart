@@ -1,5 +1,6 @@
 import 'package:ctrlfirl/controllers/chat_controller.dart';
-import 'package:ctrlfirl/services/ocr_screen.dart';
+import 'package:ctrlfirl/screens/chat_screen.dart';
+import 'package:ctrlfirl/screens/ocr_screen.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,7 +39,7 @@ class _MainAppState extends State<MainApp> {
             brightness: Brightness.dark,
             useMaterial3: true,
           ),
-          home: const OCRScreen(),
+          home: const ChatScreen(),
         ));
   }
 }

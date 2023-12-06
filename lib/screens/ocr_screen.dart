@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:ctrlfirl/controllers/chat_controller.dart';
-import 'package:ctrlfirl/services/chat_screen.dart';
+import 'package:ctrlfirl/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ctrlfirl/models/recognition_response.dart';
 import 'package:ctrlfirl/recognizer/interface/text_recognizer.dart';
