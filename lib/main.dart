@@ -1,15 +1,15 @@
-import 'package:ctrlfirl/chat_screen.dart';
-import 'package:ctrlfirl/models/recognition_response.dart';
-import 'package:ctrlfirl/ocr_screen.dart';
-import 'package:ctrlfirl/recognizer/interface/text_recognizer.dart';
-import 'package:ctrlfirl/recognizer/tesseract_text_recognizer.dart';
+import 'package:ctrlfirl/controllers/chat_controller.dart';
+import 'package:ctrlfirl/services/ocr_screen.dart';
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import './.env';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  OpenAI.apiKey = OPENAI_API_KEY;
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -26,13 +26,19 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
-      home: const OCRScreen(),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ChatController>(
+            create: (context) => ChatController(),
+          )
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            useMaterial3: true,
+          ),
+          home: const OCRScreen(),
+        ));
   }
 }

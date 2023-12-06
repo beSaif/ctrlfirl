@@ -1,16 +1,12 @@
 import 'dart:io';
-
-import 'package:ctrlfirl/chat_screen.dart';
-import 'package:flutter/foundation.dart';
+import 'package:ctrlfirl/controllers/chat_controller.dart';
+import 'package:ctrlfirl/services/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:ctrlfirl/models/recognition_response.dart';
 import 'package:ctrlfirl/recognizer/interface/text_recognizer.dart';
 import 'package:ctrlfirl/recognizer/tesseract_text_recognizer.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:image_picker/image_picker.dart';
-import 'firebase_options.dart';
+import 'package:provider/provider.dart';
 
 class OCRScreen extends StatefulWidget {
   const OCRScreen({super.key});
@@ -48,6 +44,10 @@ class _OCRScreenState extends State<OCRScreen> {
                   children: [
                     IconButton(
                       onPressed: () {
+                        ChatController chatController =
+                            Provider.of<ChatController>(context, listen: false);
+                        List<String> imagePath = image!.path.split('/');
+                        chatController.setAppbarSubtitle(imagePath.last);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
