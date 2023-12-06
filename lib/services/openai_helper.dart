@@ -19,7 +19,7 @@ class OpenaiHelper {
     debugPrint("streamAPIResponse");
 
     data['stream'] = true;
-    data['messages'] = messages;
+    data['messages'] = messages.reversed.map((e) => e.toJson()).toList();
     data['model'] = "gpt-4-1106-preview";
 
     client = http.Client();
@@ -31,7 +31,17 @@ class OpenaiHelper {
       ..body = body;
 
     final http.StreamedResponse response = await client.send(request);
+    StringBuffer buffer = StringBuffer();
+    await for (var chunk in response.stream.transform(utf8.decoder)) {
+      buffer.write(chunk);
 
-    yield* response.stream.transform(utf8.decoder);
+      while (buffer.toString().contains('\n')) {
+        var line = buffer.toString().split('\n').first;
+        buffer = StringBuffer(buffer.toString().split('\n').skip(1).join('\n'));
+
+        yield line;
+      }
+    }
+    // yield* response.stream.transform(utf8.decoder);
   }
 }

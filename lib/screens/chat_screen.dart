@@ -39,7 +39,18 @@ class _ChatScreenState extends State<ChatScreen> {
                   )
                 ],
               ),
-              actions: const [],
+              actions: [
+                chatController.isGeneratingResponse
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: SizedBox(
+                          width: 25,
+                          height: 25,
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : const SizedBox()
+              ],
             ),
             body: Chat(
               theme: const DefaultChatTheme(
@@ -49,10 +60,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 backgroundColor: Colors.black26,
               ),
               messages: chatController.chatMessages,
-              onSendPressed: chatController.handleOnPressed,
+              onSendPressed: chatController.isGeneratingResponse
+                  ? handleGeneratingResponse
+                  : chatController.handleOnPressed,
               user: chatController.user,
             ),
           );
         }),
       );
+
+  handleGeneratingResponse(_) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text('Please wait while the current response is generated')));
+  }
 }
