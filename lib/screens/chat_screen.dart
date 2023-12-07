@@ -1,4 +1,5 @@
 import 'package:ctrlfirl/models/chat_document_model.dart';
+import 'package:ctrlfirl/services/openai_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -24,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       chatController = Provider.of<ChatController>(context, listen: false);
+      chatController.reset();
       if (widget.recognizedText.isNotEmpty) {
         String systemMesssage =
             '''You're a bot that helps users help answer questions about 
@@ -35,6 +37,8 @@ class _ChatScreenState extends State<ChatScreen> {
       } else if (widget.chatDocumentModel != null) {
         chatController.setChatDocumentModel(widget.chatDocumentModel);
         chatController.setAppbarSubtitle(widget.chatDocumentModel?.title ?? '');
+        chatController
+            .addMessagesFromFirebase(widget.chatDocumentModel?.messages ?? []);
         chatController.setChatDocCreatedinFirebase(true);
         // chatController.startStream();
       }
@@ -48,6 +52,13 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Consumer<ChatController>(
             builder: (context, chatControllerConsumer, child) {
           return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                OpenaiHelper().generateTitle(
+                    chatControllerConsumer.generateMessageForOpenAI());
+              },
+              child: const Icon(Icons.refresh),
+            ),
             appBar: AppBar(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

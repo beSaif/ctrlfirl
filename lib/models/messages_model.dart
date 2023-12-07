@@ -1,5 +1,11 @@
 enum OpenAIRole { system, assistant, user }
 
+extension ParseToString on OpenAIRole {
+  String toShortString() {
+    return toString().split('.').last;
+  }
+}
+
 class MessagesModel {
   String? id;
   OpenAIRole? role;

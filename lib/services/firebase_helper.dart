@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ctrlfirl/models/chat_document_model.dart';
 import 'package:ctrlfirl/models/messages_model.dart';
-import 'package:ctrlfirl/models/test_model.dart';
 import 'package:flutter/material.dart';
 
 class FirebaseHelper {
@@ -18,27 +17,13 @@ class FirebaseHelper {
     }
   }
 
-  // Future<bool> createDocument(List<MessagesModel> chats) async {
-  //   try {
-  //     DocumentReference documentReference = _testCollection.doc();
-  //     await documentReference.set({
-  //       'id': documentReference.id,
-  //       'messages': chats.map((e) => e.toJson()).toList(),
-  //       'createdAt': DateTime.now().millisecondsSinceEpoch,
-  //     });
-  //     debugPrint('Document created');
-  //     return true;
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //     return false;
-  //   }
-  // }
-
-  Future<ChatDocumentModel> createDocument(List<MessagesModel> chats) async {
+  Future<ChatDocumentModel> createDocument(
+      List<MessagesModel> chats, String title) async {
     try {
       DocumentReference documentReference = _testCollection.doc();
       await documentReference.set({
         'id': documentReference.id,
+        'title': title,
         'messages': chats.map((e) => e.toJson()).toList(),
         'createdAt': DateTime.now().millisecondsSinceEpoch,
       });

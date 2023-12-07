@@ -47,7 +47,7 @@ class ChatController extends ChangeNotifier {
     notifyListeners();
   }
 
-  final user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
+  final user = const types.User(id: 'user');
   final assistant = const types.User(id: 'assistant');
   final system = const types.User(id: 'system');
 
@@ -90,17 +90,16 @@ class ChatController extends ChangeNotifier {
   List<MessagesModel> generateMessageForOpenAI() {
     List<MessagesModel> messageToSendToOpenAI = _chatMessages.map((e) {
       types.TextMessage textMessage = e as types.TextMessage;
-      return MessagesModel(
-          id: e.id,
-          role: e.author.id == user.id ? OpenAIRole.user : OpenAIRole.assistant,
-          content: textMessage.text);
+
+      OpenAIRole role = OpenAIRole.values.byName(textMessage.author.id);
+      return MessagesModel(id: e.id, role: role, content: textMessage.text);
     }).toList();
     if (systemMessage != null) {
       types.TextMessage systemMessageTextModel =
           systemMessage as types.TextMessage;
       messageToSendToOpenAI.add(MessagesModel(
           id: systemMessageTextModel.id,
-          role: OpenAIRole.assistant,
+          role: OpenAIRole.system,
           content: systemMessageTextModel.text));
     }
     return messageToSendToOpenAI;
@@ -144,8 +143,11 @@ class ChatController extends ChangeNotifier {
         firebasedHelper.updateDocument(
             generateMessageForOpenAI(), chatDocumentModel!.id!);
       } else {
+        List<MessagesModel> messages = generateMessageForOpenAI();
+        String title = await OpenaiHelper().generateTitle(messages);
+        setAppbarSubtitle(title);
         setChatDocumentModel(
-            await firebasedHelper.createDocument(generateMessageForOpenAI()));
+            await firebasedHelper.createDocument(messages, title));
         setChatDocCreatedinFirebase(true);
       }
       setIsGeneratingResponse(false);
@@ -170,6 +172,36 @@ class ChatController extends ChangeNotifier {
       }
       setIsGeneratingResponse(false);
     });
+  }
+
+  addMessagesFromFirebase(List<MessagesModel> message) {
+    List<types.Message> newMessages = [];
+    for (var i = 0; i < message.length; i++) {
+      OpenAIRole role = message[i].role!;
+      if (role == OpenAIRole.system) {
+        setSystemMessage(message[i].content!);
+        continue;
+      }
+
+      final messageModel = message[i];
+      final textMessage = types.TextMessage(
+          id: messageModel.id ?? randomString(),
+          author: types.User(id: role.name),
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          text: messageModel.content!);
+      newMessages.add(textMessage);
+    }
+    setchatMessages(newMessages);
+  }
+
+  reset() {
+    setIsGeneratingResponse(false);
+    setIsPostRequestFailed(false);
+    setAppbarSubtitle("");
+    setChatDocCreatedinFirebase(false);
+    setChatDocumentModel(null);
+    setchatMessages([]);
+    setSystemMessage("");
   }
 }
 
