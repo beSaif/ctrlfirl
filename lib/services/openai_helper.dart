@@ -15,6 +15,8 @@ class OpenaiHelper {
 
   late http.Client client;
 
+  // Future<String> generateTitle(List<MessagesModel> messages) async {}
+
   Stream<String> streamAPIResponse(List<MessagesModel> messages) async* {
     debugPrint("streamAPIResponse");
 

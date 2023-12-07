@@ -1,3 +1,4 @@
+import 'package:ctrlfirl/models/chat_document_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
@@ -9,7 +10,9 @@ import 'package:ctrlfirl/controllers/chat_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   final String recognizedText;
-  const ChatScreen({super.key, this.recognizedText = ""});
+  final ChatDocumentModel? chatDocumentModel;
+  const ChatScreen(
+      {super.key, this.recognizedText = "", this.chatDocumentModel});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -20,14 +23,19 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      chatController = Provider.of<ChatController>(context, listen: false);
       if (widget.recognizedText.isNotEmpty) {
         String systemMesssage =
             '''You're a bot that helps users help answer questions about 
         a particular content. You can see the content below and answer 
         to any questions user may ask regarding them. Do not make up any false answers.''';
-        chatController = Provider.of<ChatController>(context, listen: false);
         chatController.setSystemMessage(systemMesssage,
             text: "\n Content: ${widget.recognizedText}");
+        // chatController.startStream();
+      } else if (widget.chatDocumentModel != null) {
+        chatController.setChatDocumentModel(widget.chatDocumentModel);
+        chatController.setAppbarSubtitle(widget.chatDocumentModel?.title ?? '');
+        chatController.setChatDocCreatedinFirebase(true);
         // chatController.startStream();
       }
     });

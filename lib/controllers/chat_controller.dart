@@ -1,13 +1,31 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:ctrlfirl/models/chat_document_model.dart';
 import 'package:ctrlfirl/models/messages_model.dart';
+import 'package:ctrlfirl/services/firebase_helper.dart';
 import 'package:ctrlfirl/services/openai_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart';
 
 class ChatController extends ChangeNotifier {
+  final FirebaseHelper firebasedHelper = FirebaseHelper();
+
+  bool _chatDocCreatedinFirebase = false;
+  bool get chatDocCreatedinFirebase => _chatDocCreatedinFirebase;
+  setChatDocCreatedinFirebase(bool newValue) {
+    _chatDocCreatedinFirebase = newValue;
+    notifyListeners();
+  }
+
+  ChatDocumentModel? _chatDocumentModel;
+  ChatDocumentModel? get chatDocumentModel => _chatDocumentModel;
+  setChatDocumentModel(ChatDocumentModel? newValue) {
+    _chatDocumentModel = newValue;
+    notifyListeners();
+  }
+
   bool _isPostRequestFailed = false;
   bool get isPostRequestFailed => _isPostRequestFailed;
   setIsPostRequestFailed(bool newIsPostRequest) {
@@ -121,9 +139,18 @@ class ChatController extends ChangeNotifier {
           updateAMessageById(assistantTestMessage.id, assistantText);
         }
       }
-    }, onDone: () {
+    }, onDone: () async {
+      if (chatDocCreatedinFirebase) {
+        firebasedHelper.updateDocument(
+            generateMessageForOpenAI(), chatDocumentModel!.id!);
+      } else {
+        setChatDocumentModel(
+            await firebasedHelper.createDocument(generateMessageForOpenAI()));
+        setChatDocCreatedinFirebase(true);
+      }
       setIsGeneratingResponse(false);
     }, onError: (error) {
+      setIsGeneratingResponse(false);
       debugPrint("handleOnPressed error: $error");
       if (error is ClientException ||
           error is SocketException && context != null) {

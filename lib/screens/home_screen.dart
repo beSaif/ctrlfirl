@@ -1,5 +1,6 @@
 import 'package:ctrlfirl/screens/chat_screen.dart';
 import 'package:ctrlfirl/screens/ocr_screen.dart';
+import 'package:ctrlfirl/screens/previous_chats_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const OCRScreen(),
     const ChatScreen(),
-    const Placeholder(),
+    const PreviousChatsScreen(),
   ];
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:ctrlfirl/controllers/chat_controller.dart';
 import 'package:ctrlfirl/screens/home_screen.dart';
-import 'package:ctrlfirl/screens/ocr_screen.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
