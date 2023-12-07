@@ -22,6 +22,8 @@ class OpenaiHelper {
     data['messages'] = messages.reversed.map((e) => e.toJson()).toList();
     data['model'] = "gpt-4-1106-preview";
 
+    debugPrint('Messages: ${data['messages']}');
+
     client = http.Client();
     final url = Uri.parse(openaiChatURL);
     String body = jsonEncode(data);

@@ -8,6 +8,13 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart';
 
 class ChatController extends ChangeNotifier {
+  bool _isPostRequestFailed = false;
+  bool get isPostRequestFailed => _isPostRequestFailed;
+  setIsPostRequestFailed(bool newIsPostRequest) {
+    _isPostRequestFailed = newIsPostRequest;
+    notifyListeners();
+  }
+
   bool _isGeneratingResponse = false;
   bool get isGeneratingResponse => _isGeneratingResponse;
   setIsGeneratingResponse(bool newValue) {
@@ -26,6 +33,19 @@ class ChatController extends ChangeNotifier {
   final assistant = const types.User(id: 'assistant');
   final system = const types.User(id: 'system');
 
+  types.Message? _systemMessage;
+  types.Message? get systemMessage => _systemMessage;
+
+  setSystemMessage(String systemMessage, {String text = ''}) {
+    types.TextMessage sysMessage = types.TextMessage(
+        author: system,
+        id: randomString(),
+        text: systemMessage + text,
+        createdAt: DateTime.now().millisecondsSinceEpoch);
+    _systemMessage = sysMessage;
+    notifyListeners();
+  }
+
   // This is used for the Chat widget to render
   List<types.Message> _chatMessages = [];
   List<types.Message> get chatMessages => _chatMessages;
@@ -36,16 +56,6 @@ class ChatController extends ChangeNotifier {
 
   addMessage(types.TextMessage newMessage) {
     _chatMessages.insert(0, newMessage);
-    notifyListeners();
-  }
-
-  addSystemMessage(String systemMessage, {String text = ''}) {
-    types.TextMessage sysMessage = types.TextMessage(
-        author: system,
-        id: randomString(),
-        text: systemMessage + text,
-        createdAt: DateTime.now().millisecondsSinceEpoch);
-    _chatMessages.insert(0, sysMessage);
     notifyListeners();
   }
 
@@ -60,24 +70,37 @@ class ChatController extends ChangeNotifier {
   }
 
   List<MessagesModel> generateMessageForOpenAI() {
-    return _chatMessages.map((e) {
+    List<MessagesModel> messageToSendToOpenAI = _chatMessages.map((e) {
       types.TextMessage textMessage = e as types.TextMessage;
       return MessagesModel(
           id: e.id,
           role: e.author.id == user.id ? OpenAIRole.user : OpenAIRole.assistant,
           content: textMessage.text);
     }).toList();
+    if (systemMessage != null) {
+      types.TextMessage systemMessageTextModel =
+          systemMessage as types.TextMessage;
+      messageToSendToOpenAI.add(MessagesModel(
+          id: systemMessageTextModel.id,
+          role: OpenAIRole.assistant,
+          content: systemMessageTextModel.text));
+    }
+    return messageToSendToOpenAI;
   }
 
-  handleOnPressed(types.PartialText message, {BuildContext? context}) async {
+  handleOnPressed(types.PartialText message,
+      {BuildContext? context, bool regenerateResponse = false}) async {
+    setIsPostRequestFailed(false);
     setIsGeneratingResponse(true);
-    final textMessage = types.TextMessage(
-      author: user,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      id: randomString(),
-      text: message.text,
-    );
-    addMessage(textMessage);
+    if (!regenerateResponse) {
+      final textMessage = types.TextMessage(
+        author: user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: randomString(),
+        text: message.text,
+      );
+      addMessage(textMessage);
+    }
 
     final assistantTestMessage = types.TextMessage(
       author: assistant,
@@ -104,9 +127,17 @@ class ChatController extends ChangeNotifier {
       debugPrint("handleOnPressed error: $error");
       if (error is ClientException ||
           error is SocketException && context != null) {
+        setIsPostRequestFailed(true);
         ScaffoldMessenger.of(context!).removeCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Your connection is very slow...")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Your connection is very slow..."),
+          action: SnackBarAction(
+            label: 'Dismiss',
+            onPressed: () {
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            },
+          ),
+        ));
         // remove the last message
         _chatMessages.removeAt(0);
       }

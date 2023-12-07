@@ -25,7 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
         a particular content. You can see the content below and answer 
         to any questions user may ask regarding them. Do not make up any false answers.''';
         chatController = Provider.of<ChatController>(context, listen: false);
-        chatController.addSystemMessage(systemMesssage,
+        chatController.setSystemMessage(systemMesssage,
             text: "\n Content: ${widget.recognizedText}");
         // chatController.startStream();
       }
@@ -60,28 +60,41 @@ class _ChatScreenState extends State<ChatScreen> {
                           child: CircularProgressIndicator(),
                         ),
                       )
-                    : const SizedBox()
+                    : chatControllerConsumer.isPostRequestFailed
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: SizedBox(
+                                child: IconButton(
+                              onPressed: () {
+                                onSendPressed(
+                                  const types.PartialText(text: 'Placeholder'),
+                                  regenerateResponse: true,
+                                );
+                              },
+                              icon: const Icon(Icons.refresh),
+                            )),
+                          )
+                        : const SizedBox()
               ],
             ),
             body: Chat(
               theme: const DefaultChatTheme(
-                // inputBackgroundColor: Colors.white,
-                // inputTextColor: Colors.black,
-                // primaryColor: Colors.blue,
                 backgroundColor: Colors.black26,
               ),
               messages: chatControllerConsumer.chatMessages,
               onSendPressed: chatControllerConsumer.isGeneratingResponse
                   ? handleGeneratingResponse
                   : onSendPressed,
-              user: chatController.user,
+              user: chatControllerConsumer.user,
             ),
           );
         }),
       );
 
-  void onSendPressed(types.PartialText partialText) async {
-    chatController.handleOnPressed(partialText, context: context);
+  void onSendPressed(types.PartialText partialText,
+      {bool regenerateResponse = false}) async {
+    chatController.handleOnPressed(partialText,
+        context: context, regenerateResponse: regenerateResponse);
   }
 
   handleGeneratingResponse(_) {
