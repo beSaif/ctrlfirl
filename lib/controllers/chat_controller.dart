@@ -111,7 +111,6 @@ class ChatController extends ChangeNotifier {
         _chatMessages.removeAt(0);
       }
       setIsGeneratingResponse(false);
-      throw error;
     });
   }
 }
