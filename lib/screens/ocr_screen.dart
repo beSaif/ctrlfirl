@@ -51,7 +51,9 @@ class _OCRScreenState extends State<OCRScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ChatScreen(),
+                            builder: (context) => ChatScreen(
+                              recognizedText: _response?.recognizedText ?? '',
+                            ),
                           ),
                         );
                       },

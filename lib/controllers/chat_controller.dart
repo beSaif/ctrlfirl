@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:ctrlfirl/models/messages_model.dart';
 import 'package:ctrlfirl/services/openai_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:http/http.dart';
 
 class ChatController extends ChangeNotifier {
   bool _isGeneratingResponse = false;
@@ -22,6 +24,7 @@ class ChatController extends ChangeNotifier {
 
   final user = const types.User(id: '82091008-a484-4a89-ae75-a22bf8d6f3ac');
   final assistant = const types.User(id: 'assistant');
+  final system = const types.User(id: 'system');
 
   // This is used for the Chat widget to render
   List<types.Message> _chatMessages = [];
@@ -33,6 +36,16 @@ class ChatController extends ChangeNotifier {
 
   addMessage(types.TextMessage newMessage) {
     _chatMessages.insert(0, newMessage);
+    notifyListeners();
+  }
+
+  addSystemMessage(String systemMessage, {String text = ''}) {
+    types.TextMessage sysMessage = types.TextMessage(
+        author: system,
+        id: randomString(),
+        text: systemMessage + text,
+        createdAt: DateTime.now().millisecondsSinceEpoch);
+    _chatMessages.insert(0, sysMessage);
     notifyListeners();
   }
 
@@ -56,7 +69,7 @@ class ChatController extends ChangeNotifier {
     }).toList();
   }
 
-  handleOnPressed(types.PartialText message) async {
+  handleOnPressed(types.PartialText message, {BuildContext? context}) async {
     setIsGeneratingResponse(true);
     final textMessage = types.TextMessage(
       author: user,
@@ -89,7 +102,16 @@ class ChatController extends ChangeNotifier {
       setIsGeneratingResponse(false);
     }, onError: (error) {
       debugPrint("handleOnPressed error: $error");
+      if (error is ClientException ||
+          error is SocketException && context != null) {
+        ScaffoldMessenger.of(context!).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Your connection is very slow...")));
+        // remove the last message
+        _chatMessages.removeAt(0);
+      }
       setIsGeneratingResponse(false);
+      throw error;
     });
   }
 }
