@@ -1,8 +1,9 @@
-import 'package:ctrlfirl/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+
+import 'package:ctrlfirl/controllers/chat_controller.dart';
 
 // For the testing purposes, you should probably use https://pub.dev/packages/uuid.
 
@@ -66,6 +67,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: SizedBox(
                                 child: IconButton(
                               onPressed: () {
+                                // Since for user input and to regenerate, we are using the
+                                // same function. The function requires types.PartialText.
+                                // When generating, we pass a random value which will be ignored
+                                // inside the function if regenerateResponse is set as true.
+                                // this way user don't have to type the same message twice and the
+                                // same thing won't be repeated twice in the data being sent to openai.
                                 onSendPressed(
                                   const types.PartialText(text: 'Placeholder'),
                                   regenerateResponse: true,
