@@ -16,20 +16,14 @@ class PreviousChatsScreen extends StatefulWidget {
 
 class _PreviousChatsScreenState extends State<PreviousChatsScreen> {
   List<ChatDocumentModel> chatDocumentModelList = [];
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      chatDocumentModelList = await FirebaseHelper().getAllChats();
       setState(() {
-        _isLoading = true;
-      });
-      chatDocumentModelList =
-          await FirebaseHelper().getAllChats().then((value) {
-        setState(() {
-          _isLoading = false;
-        });
-        return value;
+        _isLoading = false;
       });
     });
     super.initState();
@@ -47,41 +41,32 @@ class _PreviousChatsScreenState extends State<PreviousChatsScreen> {
         child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: chatDocumentModelList.length,
-                      itemBuilder: (context, index) {
-                        String date = DateFormat('MMM dd, yyyy')
-                            .format(chatDocumentModelList[index].createdAt!);
+              children: chatDocumentModelList.map((e) {
+                String date = DateFormat('MMM dd, yyyy').format(e.createdAt!);
 
-                        String today =
-                            DateFormat('MMM dd, yyyy').format(DateTime.now());
-                        if (date == today) {
-                          date = 'Today';
-                        }
-                        return ListTile(
-                          onTap: () {
-                            Provider.of<ChatController>(context, listen: false)
-                                .reset();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                          chatDocumentModel:
-                                              chatDocumentModelList[index],
-                                        )));
-                          },
-                          title: Text(
-                            "${chatDocumentModelList[index].title}",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          subtitle: Text("$date "),
-                        );
-                      }),
-                ),
-              ],
+                String today =
+                    DateFormat('MMM dd, yyyy').format(DateTime.now());
+                if (date == today) {
+                  date = 'Today';
+                }
+                return ListTile(
+                  onTap: () {
+                    Provider.of<ChatController>(context, listen: false).reset();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                  chatDocumentModel: e,
+                                )));
+                  },
+                  title: Text(
+                    "${e.title}",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text("$date "),
+                );
+              }).toList(),
             )),
       ),
     ));

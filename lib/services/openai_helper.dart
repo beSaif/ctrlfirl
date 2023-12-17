@@ -44,12 +44,13 @@ class OpenaiHelper {
     return title;
   }
 
-  Stream<String> streamAPIResponse(List<MessagesModel> messages) async* {
-    debugPrint("streamAPIResponse");
+  Stream<String> streamAPIResponse(List<MessagesModel> messages,
+      {String model = 'gpt-3.5-turbo'}) async* {
+    debugPrint("streamAPIResponse: selectedMode: $model");
 
     data['stream'] = true;
     data['messages'] = messages.reversed.map((e) => e.toJson()).toList();
-    data['model'] = "gpt-4-1106-preview";
+    data['model'] = model;
 
     debugPrint('Messages: ${data['messages']}');
 

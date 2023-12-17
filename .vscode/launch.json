@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/saif/Coding/Flutter/ctrlfirl/windows/runner",
+      "program": "/Users/saif/Coding/Flutter/ctrlfirl/windows/runner/build/Debug/outDebug"
+    }
+  ]
+}

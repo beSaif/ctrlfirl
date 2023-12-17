@@ -1,3 +1,4 @@
+import 'package:ctrlfirl/constants/routes.dart';
 import 'package:ctrlfirl/models/chat_document_model.dart';
 import 'package:ctrlfirl/services/openai_helper.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,11 @@ class _ChatScreenState extends State<ChatScreen> {
         chatController.setChatDocCreatedinFirebase(true);
         // chatController.startStream();
       }
+      if (widget.chatDocumentModel?.model != null) {
+        debugPrint(widget.chatDocumentModel?.model);
+        chatController.setSelectedModel(
+            widget.chatDocumentModel?.model ?? 'gpt-3.5-turbo');
+      }
     });
 
     super.initState();
@@ -54,12 +60,17 @@ class _ChatScreenState extends State<ChatScreen> {
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               onPressed: () {
-                OpenaiHelper().generateTitle(
-                    chatControllerConsumer.generateMessageForOpenAI());
+                debugPrint('selectedMode: ${chatController.selectedModel}');
               },
               child: const Icon(Icons.refresh),
             ),
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.popUntil(context, ModalRoute.withName(Routes.home));
+                },
+                icon: const Icon(Icons.arrow_back),
+              ),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -105,8 +116,13 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             body: Chat(
               theme: const DefaultChatTheme(
-                backgroundColor: Colors.black26,
-              ),
+                  backgroundColor: Colors.black26,
+                  inputTextDecoration: InputDecoration(
+                      filled: false,
+                      errorBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      border: InputBorder.none)),
               messages: chatControllerConsumer.chatMessages,
               onSendPressed: chatControllerConsumer.isGeneratingResponse
                   ? handleGeneratingResponse

@@ -10,6 +10,18 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:http/http.dart';
 
 class ChatController extends ChangeNotifier {
+  String _selectedModel = 'gpt-3.5-turbo';
+  String get selectedModel => _selectedModel;
+  setSelectedModel(String newValue) {
+    _selectedModel = newValue;
+    debugPrint('selectedModel: $_selectedModel');
+    notifyListeners();
+  }
+
+  List<String> llmModels = [
+    'gpt-3.5-turbo',
+    "gpt-4-1106-preview",
+  ];
   final FirebaseHelper firebasedHelper = FirebaseHelper();
 
   bool _chatDocCreatedinFirebase = false;
@@ -128,7 +140,8 @@ class ChatController extends ChangeNotifier {
     addMessage(assistantTestMessage);
     List<MessagesModel> messages = generateMessageForOpenAI();
     messages.removeAt(0);
-    Stream<String> stream = OpenaiHelper().streamAPIResponse(messages);
+    Stream<String> stream =
+        OpenaiHelper().streamAPIResponse(messages, model: selectedModel);
     stream.listen((event) {
       if (event.contains('data:')) {
         final response = event.split('data:')[1];
@@ -146,8 +159,8 @@ class ChatController extends ChangeNotifier {
         List<MessagesModel> messages = generateMessageForOpenAI();
         String title = await OpenaiHelper().generateTitle(messages);
         setAppbarSubtitle(title);
-        setChatDocumentModel(
-            await firebasedHelper.createDocument(messages, title));
+        setChatDocumentModel(await firebasedHelper
+            .createDocument(messages, title, model: selectedModel));
         setChatDocCreatedinFirebase(true);
       }
       setIsGeneratingResponse(false);

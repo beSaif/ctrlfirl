@@ -1,9 +1,13 @@
+import 'package:ctrlfirl/constants/app_theme.dart';
+import 'package:ctrlfirl/constants/routes.dart';
+import 'package:ctrlfirl/controllers/auth_controller.dart';
 import 'package:ctrlfirl/controllers/chat_controller.dart';
 import 'package:ctrlfirl/screens/home_screen.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'firebase_options.dart';
 import './.env';
 
@@ -30,15 +34,21 @@ class _MainAppState extends State<MainApp> {
         providers: [
           ChangeNotifierProvider<ChatController>(
             create: (context) => ChatController(),
+          ),
+          ChangeNotifierProvider<AuthController>(
+            create: (context) => AuthController(),
           )
         ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.dark,
-            useMaterial3: true,
-          ),
-          home: const HomeScreen(),
-        ));
+        child:
+            Consumer<AuthController>(builder: (context, authController, child) {
+          return ResponsiveSizer(builder: (context, orientation, screenType) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              initialRoute: Routes.splash,
+              routes: Routes.routes,
+            );
+          });
+        }));
   }
 }
