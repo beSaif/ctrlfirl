@@ -1,6 +1,6 @@
 # CtrlF(IRL)
 
-An Flutter APP that let's you take/upload photos of texts and instantly chat with it.
+An Flutter App that let's you take/upload photos of texts and instantly chat with it.
 
 ## 📸 Preview
 
